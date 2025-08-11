@@ -36,5 +36,5 @@ public abstract class BaseHubHandler implements HubEventHandler {
                 .build();
     }
 
-    abstract SpecificRecordBase toAvro(HubEvent hubEvent);
+    public abstract SpecificRecordBase toAvro(HubEvent hubEvent);
 }

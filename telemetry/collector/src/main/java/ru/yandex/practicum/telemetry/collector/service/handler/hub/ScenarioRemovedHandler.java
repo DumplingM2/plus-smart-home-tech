@@ -21,7 +21,7 @@ public class ScenarioRemovedHandler extends BaseHubHandler {
 
 
     @Override
-    ScenarioRemovedEventAvro toAvro(HubEvent hubEvent) {
+    public ScenarioRemovedEventAvro toAvro(HubEvent hubEvent) {
         ScenarioRemovedEvent event = (ScenarioRemovedEvent) hubEvent;
 
 

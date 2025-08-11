@@ -38,6 +38,8 @@ public class EventController {
 
     @PostMapping("/sensors")
     public void addSensorEvent(@Valid @RequestBody SensorEvent sensorEvent) {
+        log.info("POST /sensors: id={}, hubId={}, type={}",
+                sensorEvent.getId(), sensorEvent.getHubId(), sensorEvent.getType());
         var handler = sensorEventHandlerMap.get(sensorEvent.getType());
         if (handler == null) {
             throw new IllegalArgumentException("No handler for sensor event type: " + sensorEvent.getType());
@@ -47,6 +49,8 @@ public class EventController {
 
     @PostMapping("/hubs")
     public void addHubEvent(@Valid @RequestBody HubEvent hubEvent) {
+        log.info("POST /hubs: hubId={}, type={}",
+                hubEvent.getHubId(), hubEvent.getType());
         var handler = hubEventHandlerMap.get(hubEvent.getType());
         if (handler == null) {
             throw new IllegalArgumentException("No handler for hub event type: " + hubEvent.getType());

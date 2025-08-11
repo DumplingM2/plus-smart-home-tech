@@ -23,7 +23,7 @@ public class DeviceAddedHandler extends BaseHubHandler {
     }
 
     @Override
-    SpecificRecordBase toAvro(HubEvent hubEvent) {
+    public SpecificRecordBase toAvro(HubEvent hubEvent) {
         DeviceAddedEvent addedDeviceEvent = (DeviceAddedEvent) hubEvent;
         return DeviceAddedEventAvro.newBuilder()
                 .setId(addedDeviceEvent.getId())

@@ -13,7 +13,7 @@ import java.io.IOException;
 
 
 public class GeneralAvroSerializer implements Serializer<SpecificRecordBase> {
-    Encoder encoder;
+    private Encoder encoder;
 
     @Override
     public byte[] serialize(String topic, SpecificRecordBase data) {
