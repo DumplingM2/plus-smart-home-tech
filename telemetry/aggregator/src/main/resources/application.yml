@@ -2,12 +2,12 @@ spring:
   application:
     name: aggregator
   config:
-    import: "configserver: "
+    import: "configserver:"     
   cloud:
     config:
       discovery:
         enabled: true
-        serviceId: config-server
+        serviceId: config-server  
       fail-fast: true
       retry:
         useRandomPolicy: true

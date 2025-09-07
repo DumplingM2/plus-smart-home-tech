@@ -1,11 +1,11 @@
 server:
-  port: 0
+  port: 0   # случайный порт при старте
 
 spring:
   application:
     name: collector
   config:
-    import: "configserver: "
+    import: "configserver:"        # получать конфиг через Eureka
   cloud:
     config:
       discovery:
