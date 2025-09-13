@@ -1,0 +1,10 @@
+[33ma2aaa44[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32m7-spring-cloud-microservices[m[33m, [m[1;31morigin/7-spring-cloud-microservices[m[33m)[m Исправления проблемы с analyzer
+[33m3e8dc01[m Написал решения по ТЗ Спринт 21
+[33m42c9d5a[m[33m ([m[1;31morigin/develop[m[33m, [m[1;32mdevelop[m[33m)[m Merge pull request #7 from DumplingM2/6-discovery-server
+[33mf096341[m[33m ([m[1;31morigin/6-discovery-server[m[33m)[m Merge branch 'develop' into 6-discovery-server
+[33mb615d30[m Добавил discovery-server
+[33m90d8f35[m Merge pull request #6 from DumplingM2/5-config-server
+[33m66a5a64[m[33m ([m[1;31morigin/5-config-server[m[33m)[m Добавлен ещё один сервер
+[33m5811236[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Merge pull request #5 from DumplingM2/develop
+[33me4838c0[m Добавил перед сохранением Device проверку на существование сенсора по id, во избежание дубликатов.
+[33m80e8b35[m Ограничил размер символьных полей

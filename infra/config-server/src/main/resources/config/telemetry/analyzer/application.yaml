@@ -28,8 +28,8 @@ spring:
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/smart-home
-    username: postgres
-    password: password
+    username: 12345
+    password: Aleksei
 
 grpc:
   client:
