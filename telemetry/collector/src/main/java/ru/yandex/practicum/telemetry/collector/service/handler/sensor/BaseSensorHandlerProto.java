@@ -14,7 +14,7 @@ public abstract class BaseSensorHandlerProto implements SensorEventHandlerProto 
     private final KafkaEventProducer producer;
 
     protected String topic() {
-        return producer.getConfig().getTopics().get("sensors-events");
+        return producer.getConfig().getTopics().get("telemetry-sensors");
     }
 
     @Override

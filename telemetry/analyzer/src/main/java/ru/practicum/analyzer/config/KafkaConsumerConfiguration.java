@@ -21,15 +21,14 @@ public class KafkaConsumerConfiguration {
     public Consumer<String, HubEventAvro> getHubEventConsumer() {
         Properties config = new Properties();
 
-        config.put(ConsumerConfig.CLIENT_ID_CONFIG, env.getProperty("spring.kafka.consumer.hub-client-id"));
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, env.getProperty("spring.kafka.consumer.hub-group-id"));
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, env.getProperty("spring.kafka.bootstrap-servers"));
+        config.put(ConsumerConfig.CLIENT_ID_CONFIG, "analyzer-hub-consumer");
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, "analyzer-group");
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                env.getProperty("spring.kafka.consumer.key-deserializer"));
+                "org.apache.kafka.common.serialization.StringDeserializer");
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                env.getProperty("spring.kafka.consumer.hub-event-deserializer"));
-        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,
-                env.getProperty("spring.kafka.consumer.enable-auto-commit"));
+                "kafka.deserializer.HubEventDeserializer");
+        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
 
         return new KafkaConsumer<>(config);
     }
@@ -38,15 +37,14 @@ public class KafkaConsumerConfiguration {
     public Consumer<String, SensorsSnapshotAvro> getSnapsotConsumer() {
         Properties config = new Properties();
 
-        config.put(ConsumerConfig.CLIENT_ID_CONFIG, env.getProperty("spring.kafka.consumer.snapshots-client-id"));
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, env.getProperty("spring.kafka.consumer.snapshot-group-id"));
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, env.getProperty("spring.kafka.bootstrap-servers"));
+        config.put(ConsumerConfig.CLIENT_ID_CONFIG, "analyzer-snapshot-consumer");
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, "analyzer-group");
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                env.getProperty("spring.kafka.consumer.key-deserializer"));
+                "org.apache.kafka.common.serialization.StringDeserializer");
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                env.getProperty("spring.kafka.consumer.snapshot-deserializer"));
-        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,
-                env.getProperty("spring.kafka.consumer.enable-auto-commit"));
+                "kafka.deserializer.SnapshotDeserializer");
+        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
 
         return new KafkaConsumer<>(config);
     }
