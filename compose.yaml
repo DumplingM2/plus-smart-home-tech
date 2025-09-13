@@ -41,9 +41,9 @@ services:
       - |
         set -e
         psql postgresql://12345:Aleksei@commerce-db:5432/postgres -v ON_ERROR_STOP=1 <<-EOSQL
-        create database commerce_shopping_cart;
-        create database commerce_shopping_store;
-        create database commerce_warehouse;
+        create database if not exists commerce_shopping_cart;
+        create database if not exists commerce_shopping_store;
+        create database if not exists commerce_warehouse;
         EOSQL
 
   kafka:
