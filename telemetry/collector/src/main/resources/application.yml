@@ -1,11 +1,11 @@
 server:
-  port: 0   # случайный порт при старте
+  port: 0
 
 spring:
   application:
     name: collector
   config:
-    import: "configserver:"        # получать конфиг через Eureka
+    import: "configserver:"
   cloud:
     config:
       discovery:
@@ -20,3 +20,5 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+    healthcheck:
+      enabled: true
