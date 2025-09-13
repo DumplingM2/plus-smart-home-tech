@@ -1,19 +1,17 @@
 spring:
   application:
     name: hub-router
-  config:
-    import: "configserver: "
   cloud:
     config:
-      discovery:
-        enabled: true
-        serviceId: config-server
-      fail-fast: true
-      retry:
-        useRandomPolicy: true
-        max-interval: 6000
+      enabled: false
+
+server:
+  port: 8082
+
+grpc:
+  server:
+    port: 59090
 
 eureka:
   client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+    enabled: false

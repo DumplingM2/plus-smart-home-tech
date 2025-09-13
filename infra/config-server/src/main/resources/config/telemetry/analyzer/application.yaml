@@ -28,13 +28,13 @@ spring:
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/smart-home
-    username: postgres
-    password: password
+    username: 12345
+    password: Aleksei
 
 grpc:
   client:
     hub-router:
-      address: static://localhost:59090
+      address: discovery:///hub-router
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext

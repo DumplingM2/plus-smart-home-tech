@@ -12,5 +12,13 @@ import java.util.Properties;
 @Component
 public class KafkaConfig {
     private Map<String, String> topics;
-    private Properties producerProperties;
+    private Map<String, String> producerProperties;
+    
+    public Properties getProducerProperties() {
+        Properties props = new Properties();
+        if (producerProperties != null) {
+            props.putAll(producerProperties);
+        }
+        return props;
+    }
 }

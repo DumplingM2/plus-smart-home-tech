@@ -14,7 +14,7 @@ public abstract class BaseHubEventHandlerProto implements HubEventHandlerProto {
     private final KafkaEventProducer producer;
 
     protected String topic() {
-        return producer.getConfig().getTopics().get("hubs-events");
+        return producer.getConfig().getTopics().get("telemetry-hubs");
     }
 
     @Override

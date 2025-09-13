@@ -1,22 +1,27 @@
 server:
-  port: 0   # случайный порт при старте
+  port: 0
 
 spring:
   application:
     name: collector
-  config:
-    import: "configserver:"        # получать конфиг через Eureka
   cloud:
     config:
-      discovery:
-        enabled: true
-        serviceId: config-server
-      fail-fast: true
-      retry:
-        useRandomPolicy: true
-        max-interval: 6000
+      enabled: false
+
+collector:
+  kafka:
+    topics:
+      telemetry-sensors: telemetry.sensors.v1
+      telemetry-hubs: telemetry.hubs.v1
+    producer-properties:
+      bootstrap.servers: localhost:9092
+      key.serializer: org.apache.kafka.common.serialization.StringSerializer
+      value.serializer: kafka.serializer.GeneralAvroSerializer
+
+grpc:
+  server:
+    port: 59091
 
 eureka:
   client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+    enabled: false
