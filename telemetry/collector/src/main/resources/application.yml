@@ -11,7 +11,7 @@ spring:
       discovery:
         enabled: true
         serviceId: config-server
-      fail-fast: true
+      fail-fast: false
       retry:
         useRandomPolicy: true
         max-interval: 6000
@@ -22,3 +22,17 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
     healthcheck:
       enabled: true
+    enabled: true
+    register-with-eureka: true
+    fetch-registry: true
+
+# Локальные настройки для случаев без Config Server
+grpc:
+  server:
+    port: 59091
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
