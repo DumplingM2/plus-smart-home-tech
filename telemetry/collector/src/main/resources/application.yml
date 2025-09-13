@@ -15,6 +15,7 @@ spring:
       retry:
         useRandomPolicy: true
         max-interval: 6000
+      enabled: false
 
 eureka:
   client:
@@ -22,9 +23,9 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
     healthcheck:
       enabled: true
-    enabled: true
-    register-with-eureka: true
-    fetch-registry: true
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
 
 # Локальные настройки для случаев без Config Server
 grpc:
