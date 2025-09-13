@@ -1,8 +1,9 @@
 spring:
   application:
     name: analyzer
-  config:
-    import: "configserver:"
+  # Убираем импорт Config Server для тестов
+  # config:
+  #   import: "configserver:"
   cloud:
     config:
       discovery:
@@ -12,6 +13,7 @@ spring:
       retry:
         useRandomPolicy: true
         max-interval: 6000
+      enabled: false
 
 eureka:
   client:

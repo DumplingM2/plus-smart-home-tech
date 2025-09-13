@@ -4,8 +4,9 @@ server:
 spring:
   application:
     name: collector
-  config:
-    import: "configserver:"
+  # Убираем импорт Config Server для тестов
+  # config:
+  #   import: "configserver:"
   cloud:
     config:
       discovery:
