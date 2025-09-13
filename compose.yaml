@@ -5,14 +5,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_PASSWORD=Aleksei
+      - POSTGRES_PASSWORD=progingir
       - POSTGRES_USER=12345
       - POSTGRES_DB=smart-home
-    healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      timeout: 5s
-      interval: 5s
-      retries: 10
 
   commerce-db:
     image: postgres:16.1
@@ -20,7 +15,7 @@ services:
     ports:
       - "6432:5432"
     environment:
-      - POSTGRES_PASSWORD=Aleksei
+      - POSTGRES_PASSWORD=progingir
       - POSTGRES_USER=12345
       - POSTGRES_DB=postgres
     healthcheck:
@@ -40,10 +35,10 @@ services:
       - -c
       - |
         set -e
-        psql postgresql://12345:Aleksei@commerce-db:5432/postgres -v ON_ERROR_STOP=1 <<-EOSQL
-        SELECT 'CREATE DATABASE commerce_shopping_cart' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'commerce_shopping_cart')\gexec
-        SELECT 'CREATE DATABASE commerce_shopping_store' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'commerce_shopping_store')\gexec
-        SELECT 'CREATE DATABASE commerce_warehouse' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'commerce_warehouse')\gexec
+        psql postgresql://postgres:password@commerce-db:5432 -v ON_ERROR_STOP=1 <<-EOSQL
+        create database commerce_shopping_cart;
+        create database commerce_shopping_store;
+        create database commerce_warehouse;
         EOSQL
 
   kafka:

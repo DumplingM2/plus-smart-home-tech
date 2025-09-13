@@ -4,19 +4,17 @@ server:
 spring:
   application:
     name: collector
-  # Убираем импорт Config Server для тестов
-  # config:
-  #   import: "configserver:"
+  config:
+    import: "configserver: "
   cloud:
     config:
       discovery:
         enabled: true
         serviceId: config-server
-      fail-fast: false
+      fail-fast: true
       retry:
         useRandomPolicy: true
         max-interval: 6000
-      enabled: false
 
 eureka:
   client:
@@ -24,17 +22,3 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
     healthcheck:
       enabled: true
-    enabled: false
-    register-with-eureka: false
-    fetch-registry: false
-
-# Локальные настройки для случаев без Config Server
-grpc:
-  server:
-    port: 59091
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics

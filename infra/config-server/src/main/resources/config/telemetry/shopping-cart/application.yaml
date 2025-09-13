@@ -20,8 +20,8 @@ spring:
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:6432/commerce_shopping_cart
-    username: 12345
-    password: Aleksei
+    username: postgres
+    password: password
 
 resilience4j:
   circuitbreaker:
