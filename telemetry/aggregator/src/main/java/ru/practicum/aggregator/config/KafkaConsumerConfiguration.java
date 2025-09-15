@@ -18,15 +18,14 @@ public class KafkaConsumerConfiguration {
     @Bean
     public KafkaConsumer<String, SpecificRecordBase> getConsumer() {
         Properties config = new Properties();
-        config.put(ConsumerConfig.CLIENT_ID_CONFIG, env.getProperty("spring.kafka.consumer.client-id"));
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, env.getProperty("spring.kafka.consumer.group-id"));
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, env.getProperty("spring.kafka.bootstrap-servers"));
+        config.put(ConsumerConfig.CLIENT_ID_CONFIG, "aggregator-consumer");
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, "aggregator-group");
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                env.getProperty("spring.kafka.consumer.key-deserializer"));
+                "org.apache.kafka.common.serialization.StringDeserializer");
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
                 "kafka.deserializer.SensorEventDeserializer");
-        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,
-                env.getProperty("spring.kafka.consumer.enable-auto-commit"));
+        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
 
         return new KafkaConsumer<>(config);
     }
