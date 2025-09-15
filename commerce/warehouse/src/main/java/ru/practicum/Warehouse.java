@@ -5,7 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
-@EnableFeignClients
+@EnableFeignClients(clients = {
+        ru.practicum.feign_client.StoreClient.class
+})
 public class Warehouse {
     public static void main(String[] args) {
         SpringApplication.run(Warehouse.class, args);

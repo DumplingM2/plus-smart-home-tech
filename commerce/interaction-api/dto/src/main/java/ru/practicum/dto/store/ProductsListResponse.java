@@ -1,14 +1,17 @@
 package ru.practicum.dto.store;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
 @Getter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class ProductsListResponse {
-    private List<SortProperties> sort;
-    private List<ProductDto> content;
+    List<SortProperties> sort;
+    List<ProductDto> content;
 }
 
