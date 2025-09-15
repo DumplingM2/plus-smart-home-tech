@@ -5,7 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
-@EnableFeignClients
+@EnableFeignClients(clients = {
+        ru.practicum.feign_client.StoreClient.class,
+        ru.practicum.feign_client.WarehouseClient.class
+})
 public class ShoppingCart {
     public static void main(String[] args) {
         SpringApplication.run(ShoppingCart.class, args);
