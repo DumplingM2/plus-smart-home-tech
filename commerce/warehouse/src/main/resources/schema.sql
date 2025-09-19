@@ -7,3 +7,15 @@ CREATE TABLE IF NOT EXISTS warehouse_products (
     weight DECIMAL NOT NULL,
     quantity BIGINT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS order_booking (
+    order_id UUID PRIMARY KEY,
+    delivery_id UUID
+);
+
+CREATE TABLE IF NOT EXISTS booking_products (
+    order_booking_id UUID NOT NULL,
+    product_id UUID NOT NULL,
+    quantity BIGINT NOT NULL,
+    FOREIGN KEY (order_booking_id) REFERENCES order_booking(order_id)
+);

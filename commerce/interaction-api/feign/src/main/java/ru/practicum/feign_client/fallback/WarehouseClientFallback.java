@@ -4,8 +4,10 @@ import org.springframework.stereotype.Component;
 import ru.practicum.dto.cart.ShoppingCartDto;
 import ru.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.practicum.dto.warehouse.AddressDto;
+import ru.practicum.dto.warehouse.AssemblyProductsForOrderRequest;
 import ru.practicum.dto.warehouse.BookedProductsDto;
 import ru.practicum.dto.warehouse.NewProductInWarehouseRequest;
+import ru.practicum.dto.warehouse.ShippedToDeliveryRequest;
 import ru.practicum.feign_client.WarehouseClient;
 import ru.practicum.feign_client.exception.WarehouseServerUnavailable;
 
@@ -29,6 +31,21 @@ public class WarehouseClientFallback implements WarehouseClient {
 
     @Override
     public AddressDto getWarehouseAddress() {
+        throw new WarehouseServerUnavailable("Сервер warehouse временно недоступен");
+    }
+
+    @Override
+    public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest assemblyRequest) {
+        throw new WarehouseServerUnavailable("Сервер warehouse временно недоступен");
+    }
+
+    @Override
+    public void shipProductsToDelivery(ShippedToDeliveryRequest request) {
+        throw new WarehouseServerUnavailable("Сервер warehouse временно недоступен");
+    }
+
+    @Override
+    public void returnProducts(java.util.Map<java.util.UUID, java.lang.Long> products) {
         throw new WarehouseServerUnavailable("Сервер warehouse временно недоступен");
     }
 }

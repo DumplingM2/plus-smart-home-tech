@@ -12,8 +12,8 @@ spring:
       value-deserializer: kafka.deserializer.GeneralAvroDeserializer
   datasource:
     url: jdbc:postgresql://localhost:5432/smart-home
-    username: 12345
-    password: Aleksei
+    username: Aleksei
+    password: 12345
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
