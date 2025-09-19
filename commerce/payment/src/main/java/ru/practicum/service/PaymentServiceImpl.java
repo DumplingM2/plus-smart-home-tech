@@ -1,117 +1,127 @@
 package ru.practicum.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.dto.order.OrderDto;
 import ru.practicum.dto.payment.PaymentDto;
-import ru.practicum.enums.payment.PaymentState;
+import ru.practicum.dto.store.ProductDto;
+import ru.practicum.enums.order.OrderState;
 import ru.practicum.exceptions.NoPaymentFoundException;
+import ru.practicum.feign_client.OrderClient;
+import ru.practicum.feign_client.StoreClient;
+import ru.practicum.feign_client.exception.order.NoOrderFoundException;
+import ru.practicum.feign_client.exception.payment.NotEnoughInfoInOrderToCalculateException;
+import ru.practicum.feign_client.exception.shopping_store.ProductNotFoundException;
 import ru.practicum.mapper.PaymentMapper;
 import ru.practicum.model.Payment;
+import ru.practicum.model.enums.PaymentState;
 import ru.practicum.repository.PaymentRepository;
 
-import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 @Transactional(readOnly = true)
 public class PaymentServiceImpl implements PaymentService {
-
     private final PaymentRepository paymentRepository;
+    private final StoreClient storeClient;
+    private final OrderClient orderClient;
+
+    @Value("${payment.fee_ratio}")
+    private Double feeRatio;
 
     @Override
-    public Double calculateProductCost(PaymentDto paymentDto) {
-        log.info("Calculating product cost for payment");
-        
-        // TODO: Implement product cost calculation logic
-        // This should call shopping-store service to get product prices
-        Double productCost = 100.0; // Placeholder
-        
-        log.info("Product cost calculated: {}", productCost);
-        return productCost;
+    @Transactional
+    public PaymentDto makingPaymentForOrder(OrderDto orderDto) {
+        if (orderDto.getTotalPrice() == null) {
+            throw new NotEnoughInfoInOrderToCalculateException("Для оплаты не хватает информации в заказе");
+        }
+
+        log.info("Отправляем заказ {} на оплату", orderDto.getOrderId());
+        return PaymentMapper.mapToDto(paymentRepository.save(PaymentMapper.mapToPayment(orderDto)), feeRatio);
     }
 
     @Override
-    public Double calculateTotalCost(PaymentDto paymentDto) {
-        log.info("Calculating total cost for payment");
-        
-        // TODO: Implement total cost calculation logic
-        // This should include VAT (10%) and delivery cost
-        Double productCost = paymentDto.getProductCost() != null ? paymentDto.getProductCost() : 100.0;
-        Double deliveryCost = paymentDto.getDeliveryCost() != null ? paymentDto.getDeliveryCost() : 50.0;
-        
-        Double vat = productCost * 0.1; // 10% VAT
-        Double totalCost = productCost + vat + deliveryCost;
-        
-        log.info("Total cost calculated: {}", totalCost);
-        return totalCost;
+    public Double calculateProductsCost(OrderDto orderDto) {
+        try {
+            Map<UUID, Long> products = orderDto.getProducts();
+
+            log.info("Запрашиваем стоимость продуктов из shopping-store");
+            Map<UUID, Float> productsPrice = products.keySet().stream()
+                    .map(storeClient::getProductById)
+                    .collect(Collectors.toMap(ProductDto::getProductId, ProductDto::getPrice));
+
+            log.info("Считаем стоимость всех продуктов");
+            return products.entrySet().stream()
+                    .map(entry -> entry.getValue() * productsPrice.get(entry.getKey()))
+                    .mapToDouble(Float::floatValue)
+                    .sum();
+        } catch (FeignException e) {
+            if (e.status() == 404) {
+                throw new ProductNotFoundException("Продукт не найден");
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    @Override
+    public Double calculateTotalCost(OrderDto orderDto) {
+        Double productsPrice = orderDto.getProductPrice();
+        if (productsPrice == null || orderDto.getDeliveryPrice() == null) {
+            throw new NotEnoughInfoInOrderToCalculateException("Не посчитана цена продуктов в заказе или цена доставки");
+        }
+
+        log.info("Считаем полную стоимость заказа");
+        return productsPrice + productsPrice * feeRatio + orderDto.getDeliveryPrice();
     }
 
     @Override
     @Transactional
-    public PaymentDto createPayment(PaymentDto paymentDto) {
-        log.info("Creating new payment");
-        
-        Payment payment = Payment.builder()
-                .orderId(paymentDto.getOrderId())
-                .productCost(paymentDto.getProductCost())
-                .deliveryCost(paymentDto.getDeliveryCost())
-                .totalCost(paymentDto.getTotalCost())
-                .state(PaymentState.PENDING)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+    public void changePaymentStateToSuccess(UUID paymentId) {
+        Payment oldPayment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new NoPaymentFoundException("Сведений об оплате не найдено"));
 
-        Payment savedPayment = paymentRepository.save(payment);
-        log.info("Payment created with ID: {}", savedPayment.getId());
-        
-        return PaymentMapper.toPaymentDto(savedPayment);
+        log.info("Меняес статус оплаты на {}", PaymentState.SUCCESS);
+        oldPayment.setState(PaymentState.SUCCESS);
+
+        try {
+            log.info("Запрос на смену статуса заказа на {}", OrderState.PAID);
+            orderClient.payOrder(oldPayment.getOrderId());
+        } catch (FeignException e) {
+            if (e.status() == 404) {
+                throw new NoOrderFoundException(e.getMessage());
+            } else {
+                throw e;
+            }
+        }
     }
 
     @Override
     @Transactional
-    public PaymentDto markPaymentAsSuccess(UUID paymentId) {
-        log.info("Marking payment as success for ID: {}", paymentId);
-        
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new NoPaymentFoundException("Payment not found with ID: " + paymentId));
-        
-        payment.setState(PaymentState.SUCCESS);
-        payment.setUpdatedAt(LocalDateTime.now());
-        
-        Payment savedPayment = paymentRepository.save(payment);
-        log.info("Payment marked as success for ID: {}", savedPayment.getId());
-        
-        return PaymentMapper.toPaymentDto(savedPayment);
-    }
+    public void changePaymentStateToFailed(UUID paymentId) {
+        Payment oldPayment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new NoPaymentFoundException("Сведений об оплате не найдено"));
 
-    @Override
-    @Transactional
-    public PaymentDto markPaymentAsFailed(UUID paymentId) {
-        log.info("Marking payment as failed for ID: {}", paymentId);
-        
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new NoPaymentFoundException("Payment not found with ID: " + paymentId));
-        
-        payment.setState(PaymentState.FAILED);
-        payment.setUpdatedAt(LocalDateTime.now());
-        
-        Payment savedPayment = paymentRepository.save(payment);
-        log.info("Payment marked as failed for ID: {}", savedPayment.getId());
-        
-        return PaymentMapper.toPaymentDto(savedPayment);
-    }
+        log.info("Меняем статус оплаты на {}", PaymentState.FAILED);
+        oldPayment.setState(PaymentState.FAILED);
 
-    @Override
-    public PaymentDto getPayment(UUID paymentId) {
-        log.info("Getting payment for ID: {}", paymentId);
-        
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new NoPaymentFoundException("Payment not found with ID: " + paymentId));
-        
-        return PaymentMapper.toPaymentDto(payment);
+        try {
+            log.info("Запрос на смену статуса заказа на {}", OrderState.PAYMENT_FAILED);
+            orderClient.payOrderFailed(oldPayment.getOrderId());
+        } catch (FeignException e) {
+            if (e.status() == 404) {
+                throw new NoOrderFoundException(e.getMessage());
+            } else {
+                throw e;
+            }
+        }
     }
 }

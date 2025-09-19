@@ -1,97 +1,96 @@
 package ru.practicum.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.order.CreateNewOrderRequest;
 import ru.practicum.dto.order.OrderDto;
 import ru.practicum.dto.order.ProductReturnRequest;
 import ru.practicum.service.OrderService;
 
+import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
-@RequestMapping("/api/v1/order")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/order")
 public class OrderController {
-
     private final OrderService orderService;
 
-    @PostMapping
-    public ResponseEntity<OrderDto> createNewOrder(@RequestBody CreateNewOrderRequest createOrderRequest,
-                                                   @RequestHeader("X-User-Name") String username) {
-        OrderDto order = orderService.createNewOrder(createOrderRequest, username);
-        return ResponseEntity.status(HttpStatus.CREATED).body(order);
+    @PutMapping
+    public OrderDto createNewOrder(@Valid @RequestBody CreateNewOrderRequest createOrderRequest,
+                                   @RequestParam String username) {
+        log.info("Запрос на добавление нового заказа {}", createOrderRequest);
+        return orderService.createNewOrder(createOrderRequest, username);
     }
 
     @GetMapping
-    public ResponseEntity<Page<OrderDto>> getOrdersOfUser(@RequestHeader("X-User-Name") String username,
-                                                          @RequestParam(defaultValue = "0") Integer page,
-                                                          @RequestParam(defaultValue = "10") Integer size) {
-        Page<OrderDto> orders = orderService.getOrdersOfUser(username, page, size);
-        return ResponseEntity.ok(orders);
+    public List<OrderDto> getOrdersOfUser(@RequestParam String username,
+                                          @RequestParam(defaultValue = "0") Integer page,
+                                          @RequestParam(defaultValue = "10") Integer size) {
+        log.info("Запрос на получение заказов пользователя");
+        return orderService.getOrdersOfUser(username, page, size);
     }
 
-    @PostMapping("/{orderId}/return")
-    public ResponseEntity<OrderDto> returnOrder(@PathVariable UUID orderId,
-                                               @RequestBody ProductReturnRequest returnRequest) {
-        OrderDto order = orderService.returnOrder(returnRequest);
-        return ResponseEntity.ok(order);
+    @PostMapping("/return")
+    public OrderDto returnOrder(@Valid @RequestBody ProductReturnRequest returnRequest) {
+        log.info("Запрос на возврат товаров из заказа orderId = {}", returnRequest.getOrderId());
+        return orderService.returnOrder(returnRequest);
     }
 
-    @PostMapping("/{orderId}/pay")
-    public ResponseEntity<OrderDto> payOrder(@PathVariable UUID orderId) {
-        OrderDto order = orderService.payOrder(orderId);
-        return ResponseEntity.ok(order);
+    @PostMapping("/payment")
+    public OrderDto payOrder(@RequestBody UUID orderId) {
+        log.info("Запрос на оплату заказа orderId = {}", orderId);
+        return orderService.payOrder(orderId);
     }
 
-    @PostMapping("/{orderId}/payment-failed")
-    public ResponseEntity<OrderDto> changeStateToPaymentFailed(@PathVariable UUID orderId) {
-        OrderDto order = orderService.changeStateToPaymentFailed(orderId);
-        return ResponseEntity.ok(order);
+    @PostMapping("/payment/failed")
+    public OrderDto payOrderFailed(@RequestBody UUID orderId) {
+        log.info("Неудачная оплата заказа");
+        return orderService.changeStateToPaymentFailed(orderId);
     }
 
-    @PostMapping("/{orderId}/delivery")
-    public ResponseEntity<OrderDto> sendOrderToDelivery(@PathVariable UUID orderId) {
-        OrderDto order = orderService.sendOrderToDelivery(orderId);
-        return ResponseEntity.ok(order);
+    @PostMapping("/delivery")
+    public OrderDto sendOrderToDelivery(@RequestBody UUID orderId) {
+        log.info("Запрос на передачу заказа {} в доставку", orderId);
+        return orderService.sendOrderToDelivery(orderId);
     }
 
-    @PostMapping("/{orderId}/delivery-failed")
-    public ResponseEntity<OrderDto> changeStateToDeliveryFailed(@PathVariable UUID orderId) {
-        OrderDto order = orderService.changeStateToDeliveryFailed(orderId);
-        return ResponseEntity.ok(order);
+    @PostMapping("/delivery/failed")
+    public OrderDto changeStateToDeliveryFailed(@RequestBody UUID orderId) {
+        log.info("Сообщение о том, что заказ не был доставлен");
+        return orderService.changeStateToDeliveryFailed(orderId);
     }
 
-    @PostMapping("/{orderId}/completed")
-    public ResponseEntity<OrderDto> changeStateToCompleted(@PathVariable UUID orderId) {
-        OrderDto order = orderService.changeStateToCompleted(orderId);
-        return ResponseEntity.ok(order);
+    @PostMapping("/completed")
+    public OrderDto changeStateToCompleted(@RequestBody UUID orderId) {
+        log.info("Запрос на завершение заказа {}", orderId);
+        return orderService.changeStateToCompleted(orderId);
     }
 
-    @GetMapping("/{orderId}/total-price")
-    public ResponseEntity<OrderDto> calculateOrderTotalPrice(@PathVariable UUID orderId) {
-        OrderDto order = orderService.calculateOrderTotalPrice(orderId);
-        return ResponseEntity.ok(order);
+    @PostMapping("/calculate/total")
+    public OrderDto calculateOrderTotalPrice(@RequestBody UUID orderId) {
+        log.info("Запрос на расчёт полной стоимости заказа");
+        return orderService.calculateOrderTotalPrice(orderId);
     }
 
-    @GetMapping("/{orderId}/delivery-price")
-    public ResponseEntity<OrderDto> calculateOrderDeliveryPrice(@PathVariable UUID orderId) {
-        OrderDto order = orderService.calculateOrderDeliveryPrice(orderId);
-        return ResponseEntity.ok(order);
+    @PostMapping("/calculate/delivery")
+    public OrderDto calculateOrderDeliveryPrice(@RequestBody UUID orderId) {
+        log.info("Запрос на расчёт стоимости доставки заказа");
+        return orderService.calculateOrderDeliveryPrice(orderId);
     }
 
-    @PostMapping("/{orderId}/assembly")
-    public ResponseEntity<OrderDto> sendOrderToAssembly(@PathVariable UUID orderId) {
-        OrderDto order = orderService.sendOrderToAssembly(orderId);
-        return ResponseEntity.ok(order);
+    @PostMapping("/assembly")
+    public OrderDto sendOrderToAssembly(@RequestBody UUID orderId) {
+        log.info("Запрос на сборку заказа на складе");
+        return orderService.sendOrderToAssembly(orderId);
     }
 
-    @PostMapping("/{orderId}/assembly-failed")
-    public ResponseEntity<OrderDto> changeOrderStateToAssemblyFailed(@PathVariable UUID orderId) {
-        OrderDto order = orderService.changeOrderStateToAssemblyFailed(orderId);
-        return ResponseEntity.ok(order);
+    @PostMapping("/assembly/failed")
+    public OrderDto changeOrderStateToAssemblyFailed(@RequestBody UUID orderId) {
+        log.info("Не удалось собрать заказ {}", orderId);
+        return orderService.changeOrderStateToAssemblyFailed(orderId);
     }
 }

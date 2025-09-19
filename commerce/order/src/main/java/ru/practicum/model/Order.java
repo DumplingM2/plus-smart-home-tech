@@ -1,82 +1,64 @@
 package ru.practicum.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.enums.order.OrderState;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
-@Entity
-@Table(name = "orders")
-@Data
-@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "orders")
+@Getter
+@Setter
 public class Order {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Column(name = "id")
+    UUID orderId;
 
-    @Column(name = "username", nullable = false)
-    private String username;
+    String owner;
 
-    @Column(name = "shopping_cart_id", nullable = false)
-    private UUID shoppingCartId;
-
-    @Column(name = "delivery_id")
-    private UUID deliveryId;
-
-    @Column(name = "payment_id")
-    private UUID paymentId;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "state", nullable = false)
-    private OrderState state;
+    @Column(name = "shopping_cart_id")
+    UUID shoppingCartId;
 
     @ElementCollection
     @CollectionTable(name = "order_products", joinColumns = @JoinColumn(name = "order_id"))
     @MapKeyColumn(name = "product_id")
     @Column(name = "quantity")
-    private Map<UUID, Long> products;
+    Map<UUID, Long> products;
 
-    @Column(name = "total_volume")
-    private Double totalVolume;
+    @Column(name = "payment_id")
+    UUID paymentId;
 
-    @Column(name = "total_weight")
-    private Double totalWeight;
+    @Column(name = "delivery_id")
+    UUID deliveryId;
 
-    @Column(name = "is_fragile")
-    private Boolean isFragile;
+    @ManyToOne
+    @JoinColumn(name = "delivery_address_id")
+    Address deliveryAddress;
+
+    @Enumerated(value = EnumType.STRING)
+    OrderState state;
+
+    @Column(name = "delivery_weight")
+    Double deliveryWeight;
+    @Column(name = "delivery_volume")
+    Double deliveryVolume;
+    Boolean fragile;
 
     @Column(name = "total_price")
-    private Double totalPrice;
-
-    @Column(name = "products_price")
-    private Double productsPrice;
-
+    Double totalPrice;
     @Column(name = "delivery_price")
-    private Double deliveryPrice;
+    Double deliveryPrice;
+    @Column(name = "product_price")
+    Double productPrice;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+    LocalDateTime created;
 }

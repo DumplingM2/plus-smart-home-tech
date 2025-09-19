@@ -1,54 +1,53 @@
 package ru.practicum.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.dto.order.OrderDto;
 import ru.practicum.dto.payment.PaymentDto;
+import ru.practicum.model.enums.PaymentState;
 import ru.practicum.service.PaymentService;
 
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/payment")
 @RequiredArgsConstructor
 public class PaymentController {
-
     private final PaymentService paymentService;
 
-    @PostMapping("/product-cost")
-    public ResponseEntity<Double> calculateProductCost(@RequestBody PaymentDto paymentDto) {
-        Double cost = paymentService.calculateProductCost(paymentDto);
-        return ResponseEntity.ok(cost);
-    }
-
-    @PostMapping("/total-cost")
-    public ResponseEntity<Double> calculateTotalCost(@RequestBody PaymentDto paymentDto) {
-        Double totalCost = paymentService.calculateTotalCost(paymentDto);
-        return ResponseEntity.ok(totalCost);
-    }
-
     @PostMapping
-    public ResponseEntity<PaymentDto> createPayment(@RequestBody PaymentDto paymentDto) {
-        PaymentDto payment = paymentService.createPayment(paymentDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(payment);
+    public PaymentDto makingPaymentForOrder(@Valid @RequestBody OrderDto orderDto) {
+        log.info("Запрос на создание оплаты заказа {}", orderDto.getOrderId());
+        return paymentService.makingPaymentForOrder(orderDto);
     }
 
-    @PostMapping("/{paymentId}/success")
-    public ResponseEntity<PaymentDto> markPaymentAsSuccess(@PathVariable UUID paymentId) {
-        PaymentDto payment = paymentService.markPaymentAsSuccess(paymentId);
-        return ResponseEntity.ok(payment);
+    @PostMapping("/productCost")
+    public Double calculateProductsCost(@Valid @RequestBody OrderDto orderDto) {
+        log.info("Запрос на расчёт стоимости продуктов в заказе {}", orderDto.getOrderId());
+        return paymentService.calculateProductsCost(orderDto);
     }
 
-    @PostMapping("/{paymentId}/failed")
-    public ResponseEntity<PaymentDto> markPaymentAsFailed(@PathVariable UUID paymentId) {
-        PaymentDto payment = paymentService.markPaymentAsFailed(paymentId);
-        return ResponseEntity.ok(payment);
+    @PostMapping("/totalCost")
+    public Double calculateTotalCost(@Valid @RequestBody OrderDto orderDto) {
+        log.info("Запрос на расчёт полной стоимости заказа {}", orderDto.getOrderId());
+        return paymentService.calculateTotalCost(orderDto);
     }
 
-    @GetMapping("/{paymentId}")
-    public ResponseEntity<PaymentDto> getPayment(@PathVariable UUID paymentId) {
-        PaymentDto payment = paymentService.getPayment(paymentId);
-        return ResponseEntity.ok(payment);
+    @PostMapping("/refund")
+    public void changePaymentStateToSuccess(@RequestBody UUID paymentId) {
+        log.info("Запрос на смену статуса оплаты {} на {}", paymentId, PaymentState.SUCCESS);
+        paymentService.changePaymentStateToSuccess(paymentId);
+    }
+
+    @PostMapping("/failed")
+    public void changePaymentStateToFailed(@RequestBody UUID paymentId) {
+        log.info("Запрос на смену статуса оплаты {} на {}", paymentId, PaymentState.FAILED);
+        paymentService.changePaymentStateToFailed(paymentId);
     }
 }
