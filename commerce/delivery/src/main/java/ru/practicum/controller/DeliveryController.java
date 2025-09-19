@@ -1,54 +1,49 @@
 package ru.practicum.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.delivery.DeliveryDto;
+import ru.practicum.dto.order.OrderDto;
 import ru.practicum.service.DeliveryService;
 
 import java.util.UUID;
 
+@Slf4j
 @RestController
-@RequestMapping("/api/v1/delivery")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/delivery")
 public class DeliveryController {
-
     private final DeliveryService deliveryService;
 
-    @PostMapping
-    public ResponseEntity<DeliveryDto> createDelivery(@RequestBody DeliveryDto deliveryDto) {
-        DeliveryDto delivery = deliveryService.createDelivery(deliveryDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(delivery);
+    @PutMapping
+    public DeliveryDto createNewDelivery(@Valid @RequestBody DeliveryDto deliveryDto) {
+        log.info("Запрос на создание новой доставки для заказа orderId = {}", deliveryDto.getOrderId());
+        return deliveryService.createNewDelivery(deliveryDto);
     }
 
     @PostMapping("/cost")
-    public ResponseEntity<Double> calculateDeliveryCost(@RequestBody DeliveryDto deliveryDto) {
-        Double cost = deliveryService.calculateDeliveryCost(deliveryDto);
-        return ResponseEntity.ok(cost);
+    public Double calculateDeliveryCost(@Valid @RequestBody OrderDto orderDto) {
+        log.info("Запрос на расчёт стоимости доставки");
+        return deliveryService.calculateDeliveryCost(orderDto);
     }
 
-    @PostMapping("/{deliveryId}/accept")
-    public ResponseEntity<DeliveryDto> acceptDelivery(@PathVariable UUID deliveryId) {
-        DeliveryDto delivery = deliveryService.acceptDelivery(deliveryId);
-        return ResponseEntity.ok(delivery);
+    @PostMapping("/picked")
+    public void sendProductsToDelivery(@RequestBody UUID deliveryId) {
+        log.info("Запрос на передачу товара в доставку");
+        deliveryService.sendProductsToDelivery(deliveryId);
     }
 
-    @PostMapping("/{deliveryId}/delivered")
-    public ResponseEntity<DeliveryDto> markAsDelivered(@PathVariable UUID deliveryId) {
-        DeliveryDto delivery = deliveryService.markAsDelivered(deliveryId);
-        return ResponseEntity.ok(delivery);
+    @PostMapping("/successful")
+    public void changeStateToDelivered(@RequestBody UUID deliveryId) {
+        log.info("Запрос на смену статуса доставки на DELIVERED");
+        deliveryService.changeStateToDelivered(deliveryId);
     }
 
-    @PostMapping("/{deliveryId}/failed")
-    public ResponseEntity<DeliveryDto> markAsFailed(@PathVariable UUID deliveryId) {
-        DeliveryDto delivery = deliveryService.markAsFailed(deliveryId);
-        return ResponseEntity.ok(delivery);
-    }
-
-    @GetMapping("/{deliveryId}")
-    public ResponseEntity<DeliveryDto> getDelivery(@PathVariable UUID deliveryId) {
-        DeliveryDto delivery = deliveryService.getDelivery(deliveryId);
-        return ResponseEntity.ok(delivery);
+    @PostMapping("/failed")
+    public void changeStateToFailed(@RequestBody UUID deliveryId) {
+        log.info("Запрос на смену статуса доставки на FAILED");
+        deliveryService.changeStateToFailed(deliveryId);
     }
 }

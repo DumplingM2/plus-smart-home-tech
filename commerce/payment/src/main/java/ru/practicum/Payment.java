@@ -9,8 +9,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
         ru.practicum.feign_client.OrderClient.class,
         ru.practicum.feign_client.StoreClient.class
 })
-public class PaymentApp {
+public class Payment {
     public static void main(String[] args) {
-        SpringApplication.run(PaymentApp.class, args);
+        SpringApplication.run(Payment.class, args);
     }
 }

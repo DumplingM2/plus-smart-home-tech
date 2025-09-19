@@ -1,33 +1,30 @@
 package ru.practicum.mapper;
 
+import lombok.experimental.UtilityClass;
+import ru.practicum.dto.order.OrderDto;
 import ru.practicum.dto.payment.PaymentDto;
 import ru.practicum.model.Payment;
+import ru.practicum.model.enums.PaymentState;
 
+@UtilityClass
 public class PaymentMapper {
 
-    public static PaymentDto toPaymentDto(Payment payment) {
-        return PaymentDto.builder()
-                .id(payment.getId())
-                .orderId(payment.getOrderId())
-                .productCost(payment.getProductCost())
-                .deliveryCost(payment.getDeliveryCost())
-                .totalCost(payment.getTotalCost())
-                .state(payment.getState())
-                .createdAt(payment.getCreatedAt())
-                .updatedAt(payment.getUpdatedAt())
+    public Payment mapToPayment(OrderDto dto) {
+        return Payment.builder()
+                .totalPayment(dto.getTotalPrice())
+                .deliveryTotal(dto.getDeliveryPrice())
+                .productsTotal(dto.getProductPrice())
+                .state(PaymentState.PENDING)
+                .orderId(dto.getOrderId())
                 .build();
     }
 
-    public static Payment toPayment(PaymentDto paymentDto) {
-        return Payment.builder()
-                .id(paymentDto.getId())
-                .orderId(paymentDto.getOrderId())
-                .productCost(paymentDto.getProductCost())
-                .deliveryCost(paymentDto.getDeliveryCost())
-                .totalCost(paymentDto.getTotalCost())
-                .state(paymentDto.getState())
-                .createdAt(paymentDto.getCreatedAt())
-                .updatedAt(paymentDto.getUpdatedAt())
+    public PaymentDto mapToDto(Payment payment, Double feeRatio) {
+        return PaymentDto.builder()
+                .deliveryTotal(payment.getDeliveryTotal())
+                .feeTotal(payment.getProductsTotal() * feeRatio)
+                .paymentId(payment.getPaymentId())
+                .totalPayment(payment.getTotalPayment())
                 .build();
     }
 }
