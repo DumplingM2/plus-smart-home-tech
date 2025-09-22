@@ -4,9 +4,9 @@ CREATE TABLE IF NOT EXISTS addresses (
     id UUID DEFAULT uuid_generate_v4 () PRIMARY KEY,
     country VARCHAR(100),
     city VARCHAR(100),
-    street VARCHAR(100),
-    house VARCHAR(100),
-    flat VARCHAR(100)
+    street VARCHAR(200),
+    house VARCHAR(30),
+    flat VARCHAR(20)
 );
 
 CREATE TABLE IF NOT EXISTS delivery (
