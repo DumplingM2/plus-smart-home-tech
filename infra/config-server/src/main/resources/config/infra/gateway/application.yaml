@@ -1,0 +1,45 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: shopping-cart
+          uri: lb://shopping-cart
+          predicates:
+            - Path=/api/v1/shopping-cart/**
+          filters:
+            - RewritePath=/api/v1/shopping-cart/(?<path>.*), /api/v1/shopping-cart/$\{path}
+        
+        - id: shopping-store
+          uri: lb://shopping-store
+          predicates:
+            - Path=/api/v1/shopping-store/**
+          filters:
+            - RewritePath=/api/v1/shopping-store/(?<path>.*), /api/v1/shopping-store/$\{path}
+        
+        - id: warehouse
+          uri: lb://warehouse
+          predicates:
+            - Path=/api/v1/warehouse/**
+          filters:
+            - RewritePath=/api/v1/warehouse/(?<path>.*), /api/v1/warehouse/$\{path}
+        
+        - id: order
+          uri: lb://order
+          predicates:
+            - Path=/api/v1/order/**
+          filters:
+            - RewritePath=/api/v1/order/(?<path>.*), /api/v1/order/$\{path}
+        
+        - id: payment
+          uri: lb://payment
+          predicates:
+            - Path=/api/v1/payment/**
+          filters:
+            - RewritePath=/api/v1/payment/(?<path>.*), /api/v1/payment/$\{path}
+        
+        - id: delivery
+          uri: lb://delivery
+          predicates:
+            - Path=/api/v1/delivery/**
+          filters:
+            - RewritePath=/api/v1/delivery/(?<path>.*), /api/v1/delivery/$\{path}

@@ -5,12 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.cart.ShoppingCartDto;
-import ru.practicum.dto.warehouse.AddProductToWarehouseRequest;
-import ru.practicum.dto.warehouse.AddressDto;
-import ru.practicum.dto.warehouse.BookedProductsDto;
-import ru.practicum.dto.warehouse.NewProductInWarehouseRequest;
+import ru.practicum.dto.warehouse.*;
 import ru.practicum.feign_client.WarehouseClient;
 import ru.practicum.service.WarehouseService;
+
+import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -42,5 +42,23 @@ public class WarehouseController implements WarehouseClient {
     public AddressDto getWarehouseAddress() {
         log.info("Запрос на получение адреса склада");
         return service.getWarehouseAddress();
+    }
+
+    @PostMapping("/assembly")
+    public BookedProductsDto assemblyProductsForOrder(@Valid @RequestBody AssemblyProductsForOrderRequest assemblyRequest) {
+        log.info("Запрос на сборку товаров для заказа {}", assemblyRequest.getOrderId());
+        return service.assemblyProductsForOrder(assemblyRequest);
+    }
+
+    @PostMapping("/shipped")
+    public void shipProductsToDelivery(@Valid @RequestBody ShippedToDeliveryRequest request) {
+        log.info("Запрос на передачу товаров в доставку для заказа {}", request.getOrderId());
+        service.shipProductsToDelivery(request);
+    }
+
+    @PostMapping("/return")
+    public void returnProducts(@Valid @RequestBody Map<UUID, Long> products) {
+        log.info("Запрос на возврат товаров на склад");
+        service.returnProducts(products);
     }
 }
